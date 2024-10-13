@@ -15,7 +15,7 @@ class Button extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: CircleAvatar(
-        maxRadius: 32,
+        radius: 36,
         child: Text(
           buttonText,
           style: const TextStyle(fontSize: 28),

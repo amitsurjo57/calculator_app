@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'button.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
@@ -10,7 +10,6 @@ class CalculatorScreen extends StatefulWidget {
 }
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
-
   String number = '';
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -31,7 +30,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           SizedBox(
             width: double.infinity,
             height: 270,
-            // color: Colors.green,
             child: Padding(
               padding: const EdgeInsets.only(right: 32),
               child: Column(
@@ -41,6 +39,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   TextField(
                     controller: _textEditingController,
                     readOnly: true,
+                    autofocus: true,
                     showCursor: true,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
@@ -65,7 +64,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               IconButton(
                 onPressed: () {
                   setState(() {
-                    number = '';
+                    number = number.substring(0, number.length - 1);
                     _textEditingController.text = number;
                   });
                 },
@@ -102,11 +101,30 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               Button(
                 buttonText: "C",
-                onTap: () => onTapButton('C'),
+                onTap: () {
+                  setState(() {
+                    number = '';
+                    _textEditingController.text = number;
+                  });
+                },
               ),
               Button(
                 buttonText: "()",
-                onTap: () => onTapButton('()'),
+                onTap: () {
+                  setState(() {
+                    for (int i = number.length - 1; i >= 0; i--) {
+                      if (number[i] == '(') {
+                        onTapButton(')');
+                        return;
+                      } else if (number[i] == ')' ||
+                          (!number.contains('(') &&
+                          !number.contains(')'))) {
+                        onTapButton('(');
+                        return;
+                      }
+                    }
+                  });
+                },
               ),
               Button(
                 buttonText: "%",
