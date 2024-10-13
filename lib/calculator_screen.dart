@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_calculator_2/color_utils.dart';
 import 'button.dart';
 import 'package:math_expressions/math_expressions.dart';
 
@@ -11,7 +12,7 @@ class CalculatorScreen extends StatefulWidget {
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
   String number = '';
-
+  double answer = 0;
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -24,6 +25,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.sizeOf(context);
     return Scaffold(
+      backgroundColor: Colors.black,
       resizeToAvoidBottomInset: false,
       body: Column(
         children: [
@@ -40,49 +42,47 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     controller: _textEditingController,
                     readOnly: true,
                     autofocus: true,
-                    showCursor: true,
+                    showCursor: false,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                     ),
                     textAlign: TextAlign.end,
-                    style: const TextStyle(fontSize: 40),
+                    style: const TextStyle(
+                      fontSize: 40,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 60),
-                  const Text(
-                    '0',
-                    style: TextStyle(
-                      fontSize: 40,
+                  FittedBox(
+                    child: Text(
+                      '$answer',
+                      style: const TextStyle(
+                        fontSize: 40,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    number = number.substring(0, number.length - 1);
-                    _textEditingController.text = number;
-                  });
-                },
-                icon: const Icon(Icons.backspace),
+          Container(
+            alignment: Alignment.topRight,
+            padding: const EdgeInsets.only(right: 28),
+            child: IconButton(
+              onPressed: onBackSpace,
+              icon: const Icon(
+                Icons.backspace_outlined,
+                color: ColorUtils.operatorText,
               ),
-              const SizedBox(width: 20),
-            ],
+            ),
           ),
+          const SizedBox(width: 20),
           const Divider(
             thickness: 2,
             color: Colors.grey,
           ),
-          Row(
-            children: [
-              mainButtons(screenSize),
-              operatorButtons(screenSize),
-            ],
-          )
+          mainButtons(screenSize),
         ],
       ),
     );
@@ -90,7 +90,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   Container mainButtons(Size screenSize) {
     return Container(
-      width: 280,
+      width: screenSize.width,
       height: screenSize.height - 340,
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -101,34 +101,27 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               Button(
                 buttonText: "C",
-                onTap: () {
-                  setState(() {
-                    number = '';
-                    _textEditingController.text = number;
-                  });
-                },
+                onTap: onClear,
+                btnColor: ColorUtils.primaryButton,
+                txtColor: ColorUtils.clearText,
               ),
               Button(
                 buttonText: "()",
-                onTap: () {
-                  setState(() {
-                    for (int i = number.length - 1; i >= 0; i--) {
-                      if (number[i] == '(') {
-                        onTapButton(')');
-                        return;
-                      } else if (number[i] == ')' ||
-                          (!number.contains('(') &&
-                          !number.contains(')'))) {
-                        onTapButton('(');
-                        return;
-                      }
-                    }
-                  });
-                },
+                onTap: onTapBraces,
+                btnColor: ColorUtils.primaryButton,
+                txtColor: ColorUtils.operatorText,
               ),
               Button(
                 buttonText: "%",
                 onTap: () => onTapButton('%'),
+                btnColor: ColorUtils.primaryButton,
+                txtColor: ColorUtils.operatorText,
+              ),
+              Button(
+                buttonText: '/',
+                onTap: () => onTapButton('/'),
+                btnColor: ColorUtils.primaryButton,
+                txtColor: ColorUtils.operatorText,
               ),
             ],
           ),
@@ -138,14 +131,26 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               Button(
                 buttonText: "7",
                 onTap: () => onTapButton('7'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: "8",
                 onTap: () => onTapButton('8'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: "9",
                 onTap: () => onTapButton('9'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
+              ),
+              Button(
+                buttonText: 'X',
+                onTap: () => onTapButton('x'),
+                btnColor: ColorUtils.primaryButton,
+                txtColor: ColorUtils.operatorText,
               ),
             ],
           ),
@@ -155,14 +160,26 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               Button(
                 buttonText: "4",
                 onTap: () => onTapButton('4'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: "5",
                 onTap: () => onTapButton('5'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: "6",
                 onTap: () => onTapButton('6'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
+              ),
+              Button(
+                buttonText: '-',
+                onTap: () => onTapButton('-'),
+                btnColor: ColorUtils.primaryButton,
+                txtColor: ColorUtils.operatorText,
               ),
             ],
           ),
@@ -172,14 +189,26 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               Button(
                 buttonText: "1",
                 onTap: () => onTapButton('1'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: "2",
                 onTap: () => onTapButton('2'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: "3",
                 onTap: () => onTapButton('3'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
+              ),
+              Button(
+                buttonText: '+',
+                onTap: () => onTapButton('+'),
+                btnColor: ColorUtils.primaryButton,
+                txtColor: ColorUtils.operatorText,
               ),
             ],
           ),
@@ -188,15 +217,27 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               Button(
                 buttonText: "+/-",
-                onTap: () => onTapButton('+/-'),
+                onTap: onNegativeNum,
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: "0",
                 onTap: () => onTapButton('0'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
               ),
               Button(
                 buttonText: ".",
                 onTap: () => onTapButton('.'),
+                btnColor: ColorUtils.secondaryButton,
+                txtColor: Colors.white,
+              ),
+              Button(
+                buttonText: '=',
+                onTap: onEqualButton,
+                btnColor: const Color(0xFF318507),
+                txtColor: Colors.white,
               ),
             ],
           ),
@@ -205,43 +246,74 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  Container operatorButtons(Size screenSize) {
-    return Container(
-      width: screenSize.width - 280,
-      height: screenSize.height - 340,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Button(
-            buttonText: '/',
-            onTap: () => onTapButton('/'),
-          ),
-          Button(
-            buttonText: 'X',
-            onTap: () => onTapButton('X'),
-          ),
-          Button(
-            buttonText: '-',
-            onTap: () => onTapButton('-'),
-          ),
-          Button(
-            buttonText: '+',
-            onTap: () => onTapButton('+'),
-          ),
-          Button(
-            buttonText: '=',
-            onTap: () => onTapButton('='),
-          ),
-        ],
-      ),
-    );
+  void onBackSpace() {
+    setState(() {
+      if (number.length == 1) {
+        number = '';
+        _textEditingController.text = number;
+        answer = 0;
+      } else {
+        number = number.substring(0, number.length - 1);
+        _textEditingController.text = number;
+        onAnswer();
+      }
+    });
+  }
+
+  void onClear() {
+    setState(() {
+      number = '';
+      _textEditingController.text = number;
+      answer = 0;
+    });
+  }
+
+  void onTapBraces() {
+    setState(() {
+      for (int i = number.length - 1; i >= 0; i--) {
+        if (number[i] == '(') {
+          onTapButton(')');
+          return;
+        } else if (number[i] == ')' ||
+            (!number.contains('(') && !number.contains(')'))) {
+          onTapButton('(');
+          return;
+        }
+      }
+    });
   }
 
   void onTapButton(String txt) {
     setState(() {
       number += txt;
       _textEditingController.text = number;
+      onAnswer();
+    });
+  }
+
+  void onAnswer() {
+    setState(() {
+      String finalEquation = number;
+      finalEquation = finalEquation.replaceAll('x', '*');
+
+      Parser p = Parser();
+      Expression exp = p.parse(finalEquation);
+      ContextModel cm = ContextModel();
+      answer = exp.evaluate(EvaluationType.REAL, cm);
+    });
+  }
+
+  void onNegativeNum() {
+    setState(() {
+      number = '-$number';
+      _textEditingController.text = number;
+      onAnswer();
+    });
+  }
+
+  void onEqualButton() {
+    setState(() {
+      _textEditingController.text = answer.toString();
     });
   }
 }
