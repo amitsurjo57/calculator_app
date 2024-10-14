@@ -113,13 +113,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               ),
               Button(
                 buttonText: "%",
-                onTap: () => onTapButton('%'),
+                onTap: () => onTapNumber('%'),
                 btnColor: ColorUtils.primaryButton,
                 txtColor: ColorUtils.operatorText,
               ),
               Button(
                 buttonText: '/',
-                onTap: () => onTapButton('/'),
+                onTap: () => onTapNumber('/'),
                 btnColor: ColorUtils.primaryButton,
                 txtColor: ColorUtils.operatorText,
               ),
@@ -130,25 +130,25 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               Button(
                 buttonText: "7",
-                onTap: () => onTapButton('7'),
+                onTap: () => onTapNumber('7'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: "8",
-                onTap: () => onTapButton('8'),
+                onTap: () => onTapNumber('8'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: "9",
-                onTap: () => onTapButton('9'),
+                onTap: () => onTapNumber('9'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: 'X',
-                onTap: () => onTapButton('x'),
+                onTap: () => onTapNumber('x'),
                 btnColor: ColorUtils.primaryButton,
                 txtColor: ColorUtils.operatorText,
               ),
@@ -159,25 +159,25 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               Button(
                 buttonText: "4",
-                onTap: () => onTapButton('4'),
+                onTap: () => onTapNumber('4'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: "5",
-                onTap: () => onTapButton('5'),
+                onTap: () => onTapNumber('5'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: "6",
-                onTap: () => onTapButton('6'),
+                onTap: () => onTapNumber('6'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: '-',
-                onTap: () => onTapButton('-'),
+                onTap: () => onTapNumber('-'),
                 btnColor: ColorUtils.primaryButton,
                 txtColor: ColorUtils.operatorText,
               ),
@@ -188,25 +188,25 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               Button(
                 buttonText: "1",
-                onTap: () => onTapButton('1'),
+                onTap: () => onTapNumber('1'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: "2",
-                onTap: () => onTapButton('2'),
+                onTap: () => onTapNumber('2'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: "3",
-                onTap: () => onTapButton('3'),
+                onTap: () => onTapNumber('3'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: '+',
-                onTap: () => onTapButton('+'),
+                onTap: () => onTapNumber('+'),
                 btnColor: ColorUtils.primaryButton,
                 txtColor: ColorUtils.operatorText,
               ),
@@ -223,13 +223,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               ),
               Button(
                 buttonText: "0",
-                onTap: () => onTapButton('0'),
+                onTap: () => onTapNumber('0'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
               Button(
                 buttonText: ".",
-                onTap: () => onTapButton('.'),
+                onTap: () => onTapNumber('.'),
                 btnColor: ColorUtils.secondaryButton,
                 txtColor: Colors.white,
               ),
@@ -272,18 +272,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     setState(() {
       for (int i = number.length - 1; i >= 0; i--) {
         if (number[i] == '(') {
-          onTapButton(')');
+          onTapNumber(')');
           return;
         } else if (number[i] == ')' ||
             (!number.contains('(') && !number.contains(')'))) {
-          onTapButton('(');
+          onTapNumber('(');
           return;
         }
       }
     });
   }
 
-  void onTapButton(String txt) {
+  void onTapNumber(String txt) {
     setState(() {
       number += txt;
       _textEditingController.text = number;
@@ -296,10 +296,25 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       String finalEquation = number;
       finalEquation = finalEquation.replaceAll('x', '*');
 
-      Parser p = Parser();
-      Expression exp = p.parse(finalEquation);
-      ContextModel cm = ContextModel();
-      answer = exp.evaluate(EvaluationType.REAL, cm);
+      if (finalEquation.contains('%')) {
+        int index = 0;
+        for (int i = 0; i < finalEquation.length; i++) {
+          if (finalEquation[i] == '%') {
+            index = i;
+            break;
+          }
+        }
+        String str1 = finalEquation.substring(0, index);
+        String str2 = finalEquation.substring(index + 1, finalEquation.length);
+        int num1 = int.tryParse(str1) ?? 0;
+        int num2 = int.tryParse(str2) ?? 0;
+        answer = num1 * (num2 / 100);
+      } else {
+        Parser p = Parser();
+        Expression exp = p.parse(finalEquation);
+        ContextModel cm = ContextModel();
+        answer = exp.evaluate(EvaluationType.REAL, cm);
+      }
     });
   }
 
