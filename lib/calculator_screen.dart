@@ -285,6 +285,22 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   void onTapNumber(String txt) {
     setState(() {
+      // This is used if someone do basic operation after percentage calculation.
+      /* We check if **number contains '%' character and if the last character
+      * of **number is not '%' and if the user press '+' or '-' or 'x' or '/'
+      * button.*/
+      // Then we will store **answer in **number
+      if (number.contains('%') &&
+          number.substring(number.length - 1) != '%' &&
+          (txt == '+' || txt == '-' || txt == 'x' || txt == '/')) {
+        number = answer.toString();
+        _textEditingController.text = number;
+      }
+
+      /*
+      *  When user press any number or operator it will
+      *  append in the end of **number
+      * */
       number += txt;
       _textEditingController.text = number;
       onAnswer();
@@ -297,23 +313,36 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       finalEquation = finalEquation.replaceAll('x', '*');
 
       if (finalEquation.contains('%')) {
-        int index = 0;
-        for (int i = 0; i < finalEquation.length; i++) {
-          if (finalEquation[i] == '%') {
-            index = i;
-            break;
+        //  This is for percentage calculation.
+        //  For example 9%2 = 0.18, it means 9 x (2 / 100) = 0.18
+        //  Split the **finalEquation in '%' character
+        // Initialize the **finalAnswer to double form the fist element of **lst
+        // Then calculate the **finalAnswer using loop
+        // Then store **finalAnswer into **answer
+        try {
+          List<String> lst = finalEquation.split('%');
+          double finalAnswer = double.parse(lst.first);
+
+          for (int i = 1; i < lst.length; i++) {
+            finalAnswer *= (double.parse(lst[i]) / 100);
           }
+
+          answer = finalAnswer;
+        } catch (e) {
+          answer = 0;
         }
-        String str1 = finalEquation.substring(0, index);
-        String str2 = finalEquation.substring(index + 1, finalEquation.length);
-        int num1 = int.tryParse(str1) ?? 0;
-        int num2 = int.tryParse(str2) ?? 0;
-        answer = num1 * (num2 / 100);
       } else {
-        Parser p = Parser();
-        Expression exp = p.parse(finalEquation);
-        ContextModel cm = ContextModel();
-        answer = exp.evaluate(EvaluationType.REAL, cm);
+        // This is used for parsing any equation
+        // Here, we used a third party package for parsing equation
+        // Package name is math_expression
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(finalEquation);
+          ContextModel cm = ContextModel();
+          answer = exp.evaluate(EvaluationType.REAL, cm);
+        } catch (e) {
+          answer = 0;
+        }
       }
     });
   }
